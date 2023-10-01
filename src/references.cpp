@@ -25,14 +25,22 @@ int main() {
   int &b = a;
 
   // As stated, if we try to print b, we will get 10.
-  std::cout << "b is " << b << std::endl;
+  std::cout << "a should be 10: " << a << std::endl;
+  std::cout << "b should be 10: " << b << std::endl;
 
   // References can also be passed into functions. Take the function add_three,
   // which takes in an int reference and adds 3 to it. If we call this function,
   // on a, since a is being taken as a reference, then a's value in the caller
   // context will change value.
   add_three(a);
-  std::cout << "a is " << a << std::endl;
+  std::cout << "After add_three on a..." << std::endl;
+  std::cout << "a should be 13: " << a << std::endl; // a is now 13
+  std::cout << "b should be 13: " << b << std::endl; // b is now 13
+
+  add_three(b);
+  std::cout << "After add_three on b..." << std::endl;
+  std::cout << "a should be 16: " << a << std::endl;
+  std::cout << "b should be 16: " << b << std::endl;
 
   return 0;
 }
