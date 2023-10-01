@@ -38,8 +38,13 @@
 // It seizes ownership of the vector passed in, appends 3 to
 // the back of it, and prints the values in the vector.
 void move_add_three_and_print(std::vector<int> &&vec) {
-  std::vector<int> vec1 = std::move(vec);
-  vec1.push_back(3);
+  std::vector<int> vec1 = std::move(vec); // take ownership
+  std::cout << "Before push_back:\n";
+  for (const int &item : vec1) {
+    std::cout << item << " ";
+  }
+  vec1.push_back(3); // append
+  std::cout << "\nAfter push_back:\n";
   for (const int &item : vec1) {
     std::cout << item << " ";
   }
@@ -67,14 +72,18 @@ int main() {
   // Let's see a basic example of moving data from one lvalue to another.
   // We define a vector of integers here.
   std::vector<int> int_array = {1, 2, 3, 4};
+  std::cout << "Location of int_array: " << &int_array << std::endl;
 
   // Now, we move the values of this array to another lvalue.
   std::vector<int> stealing_ints = std::move(int_array);
+  std::cout << "Location of stealing_ints: " << &stealing_ints << std::endl;
 
   // Rvalue references are references that refer to the data itself, as opposed
   // to a lvalue. Calling std::move on a lvalue (such as stealing_ints) will
   // result in the expression being cast to a rvalue reference.
   std::vector<int> &&rvalue_stealing_ints = std::move(stealing_ints);
+  std::cout << "Location of rvalue_stealing_ints: " << &rvalue_stealing_ints
+            << std::endl;
 
   // However, note that after this, it is still possible to access the data in
   // stealing_ints, since that is the lvalue that owns the data, not
@@ -84,23 +93,26 @@ int main() {
   // It is possible to pass in a rvalue reference into a function. However,
   // once the rvalue is moved from the lvalue in the caller context to a lvalue
   // in the callee context, it is effectively unusable to the caller.
-  // Essentially, after move_add_three_and_print is called, we cannot use the
-  // data in int_array2. It no longer belongs to the int_array2 lvalue.
+  //  NOTE: Essentially, after move_add_three_and_print is called, we cannot
+  // use the data in int_array2. It no longer belongs to the int_array2 lvalue.
   std::vector<int> int_array2 = {1, 2, 3, 4};
   std::cout << "Calling move_add_three_and_print...\n";
+  // NOTE: move first then add three
   move_add_three_and_print(std::move(int_array2));
 
   // It would be unwise to try to do anything with int_array2 here. Uncomment
-  // the code to try it out! (On my machine, this segfaults...) NOTE: THIS MIGHT
-  // WORK FOR YOU. THIS DOES NOT MEAN THAT THIS IS WISE TO DO! 
+  // the code to try it out! (On my machine, this segfaults...)
+  // WARNING: THIS
+  // MIGHT WORK FOR YOU. THIS DOES NOT MEAN THAT THIS IS WISE TO DO!
   // std::cout << int_array2[1] << std::endl;
 
-  // If we don't move the lvalue in the caller context to any lvalue in the
-  // callee context, then effectively the function treats the rvalue reference
-  // passed in as a reference, and the lvalue in this context still owns the
-  // vector data.
+  // If we don't move the lvalue in the caller context to any lvalue in
+  // the callee context, then effectively the function treats the rvalue
+  // reference passed in as __a reference__, and the lvalue in this context
+  // still owns the vector data.
   std::vector<int> int_array3 = {1, 2, 3, 4};
   std::cout << "Calling add_three_and_print...\n";
+  // NOTE: did not move
   add_three_and_print(std::move(int_array3));
 
   // As seen here, we can print from this array.
