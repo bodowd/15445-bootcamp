@@ -39,9 +39,10 @@ public:
   Person() : age_(0), nicknames_({}), valid_(true) {}
 
   // Keep in mind that this constructor takes in a std::vector<std::string>
-  // rvalue. This makes the constructor more efficient because it doesn't deep
-  // copy the vector instance when constructing the person object.
-  Person(uint32_t age, std::vector<std::string> &&nicknames)
+  // __rvalue__. This makes the constructor more efficient because it doesn't
+  // deep copy the vector instance when constructing the person object.
+  Person(uint32_t age,
+         std::vector<std::string> &&nicknames) // &&nicknames is an rvalue
       : age_(age), nicknames_(std::move(nicknames)), valid_(true) {}
 
   // Move constructor for class Person. It takes in a rvalue with type Person,
@@ -54,11 +55,12 @@ public:
   // significant copying cost. Generally, for numeric types, it's okay to copy
   // them, but for other types, such as strings and object types, one should
   // move the class instance unless copying is necessary.
-  Person(Person &&person)
+  Person(Person &&person) // &&person is an rvalue
       : age_(person.age_), nicknames_(std::move(person.nicknames_)),
         valid_(true) {
     std::cout << "Calling the move constructor for class Person.\n";
     // The moved object's validity tag is set to false.
+    std::cout << "I got moved!" << std::endl;
     person.valid_ = false;
   }
 
@@ -85,6 +87,7 @@ public:
   // to the string at nicknames_[i]. This also implies that we don't copy
   // the resulting string, and the memory address this returns under the
   // hood is actually the one pointing to the nicknames_ vector's memory.
+  // NOTE: (my note) I think this still returns a string despite the "&"
   std::string &GetNicknameAtI(size_t i) { return nicknames_[i]; }
 
   void PrintValid() {
@@ -93,6 +96,20 @@ public:
     } else {
       std::cout << "Object is invalid." << std::endl;
     }
+  }
+
+  void PrintAge() { std::cout << "Person's age: " << age_ << std::endl; }
+
+  void PrintNicknameAtI(size_t i) {
+    std::cout << "Nickname at " << i << " is: " << GetNicknameAtI(i)
+              << std::endl;
+  }
+
+  void PrintLocationOfNicknameAtI(size_t i) {
+    std::cout << "Location of nickname at " << i << " is: " << &nicknames_[i]
+              << std::endl;
+    std::cout << "Location of nickname at " << i
+              << " from GetNicknameAtI is: " << &GetNicknameAtI(i) << std::endl;
   }
 
 private:
@@ -110,15 +127,22 @@ int main() {
   Person andy(15445, {"andy", "pavlo"});
   std::cout << "Printing andy's validity: ";
   andy.PrintValid();
+  andy.PrintAge();
+  andy.PrintNicknameAtI(1);
+  andy.PrintLocationOfNicknameAtI(1);
 
   // To move the contents of the andy object to another object, we can use
-  // std::move in a couple ways. This method calls the move assignment operator.
+  // std::move in a couple ways. This method calls the move assignment
+  // operator.
   Person andy1;
+  std::cout << "About to move andy to andy1" << std::endl;
   andy1 = std::move(andy);
 
   // Note that andy1 is valid, while andy is not a valid object.
+  std::cout << "Location of andy1: " << &andy1 << std::endl;
   std::cout << "Printing andy1's validity: ";
   andy1.PrintValid();
+  std::cout << "Location of andy: " << &andy << std::endl;
   std::cout << "Printing andy's validity: ";
   andy.PrintValid();
 
@@ -126,6 +150,7 @@ int main() {
   // of the original andy object have moved to andy1, then moved to andy2. The
   // andy and andy1 lvalues are effectively defunct (and should not be used,
   // unless they are re-initialized).
+  std::cout << "About to move andy1 to andy2" << std::endl;
   Person andy2(std::move(andy1));
 
   // Note that andy2 is valid, while andy1 is not a valid object.
