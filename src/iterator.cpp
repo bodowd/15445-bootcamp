@@ -141,6 +141,17 @@ public:
     size_ += 1;
   }
 
+  void InsertAtTail(int val) {
+    Node *new_node = new Node(val);
+    Node *current = head_;
+    while (current->next_ != nullptr) {
+      current = current->next_;
+    }
+    current->next_ = new_node;
+    new_node->prev_ = current;
+    size_ += 1;
+  }
+
   // The Begin() function returns an iterator to the head of the DLL,
   // which is the first element to access when iterating through.
   DLLIterator Begin() { return DLLIterator(head_); }
@@ -164,6 +175,9 @@ int main() {
   dll.InsertAtHead(3);
   dll.InsertAtHead(2);
   dll.InsertAtHead(1);
+
+  dll.InsertAtTail(10);
+  dll.InsertAtHead(0);
 
   // We can iterate through our DLL via both our prefix and postfix
   // operators.
