@@ -102,6 +102,11 @@ int main() {
   // class is managing an int pointer.
   IntPtrManager a(445);
 
+  // initializing without a value sets it to zero -- the first constructor in
+  // the class
+  IntPtrManager c;
+  std::cout << "1. Value of c is " << c.GetVal() << std::endl;
+
   // Getting the value works as expected.
   std::cout << "1. Value of a is " << a.GetVal() << std::endl;
 
